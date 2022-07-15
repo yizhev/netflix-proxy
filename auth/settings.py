@@ -20,7 +20,7 @@ AUTO_AUTH = False
 DEBUG = False
 
 # default web.py server port
-DEFAULT_PORT = 8080
+DEFAULT_PORT = 8888
 
 # form input mode
 FORM_INPUTS_HIDDEN = False
