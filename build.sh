@@ -171,8 +171,8 @@ else
 fi
 
 log_action_begin_msg "adding IPv4 iptables rules"
-sudo iptables -t nat -A PREROUTING -i ${IFACE} -p tcp --dport 80 -j REDIRECT --to-port 8080\
-  && sudo iptables -t nat -A PREROUTING -i ${IFACE} -p tcp --dport 443 -j REDIRECT --to-port 8080\
+sudo iptables -t nat -A PREROUTING -i ${IFACE} -p tcp --dport 80 -j REDIRECT --to-port 8888\
+  && sudo iptables -t nat -A PREROUTING -i ${IFACE} -p tcp --dport 443 -j REDIRECT --to-port 8888\
   && sudo iptables -t nat -A PREROUTING -i ${IFACE} -p udp --dport 53 -j REDIRECT --to-port 5353\
   && sudo iptables -t nat -A POSTROUTING -o ${IFACE} -j MASQUERADE\
   && sudo iptables -A INPUT -p icmp -j ACCEPT\
@@ -182,14 +182,14 @@ sudo iptables -t nat -A PREROUTING -i ${IFACE} -p tcp --dport 80 -j REDIRECT --t
   && sudo iptables -A INPUT -p udp -m udp --dport 53 -j ACCEPT\
   && sudo iptables -A INPUT -p udp -m udp --dport 5353 -j ACCEPT\
   && sudo iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT\
-  && sudo iptables -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT\
+  && sudo iptables -A INPUT -p tcp -m tcp --dport 8888 -j ACCEPT\
   && sudo iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT\
   && sudo iptables -A INPUT -j REJECT --reject-with icmp-host-prohibited
 log_action_end_msg $?
 
 log_action_begin_msg "adding IPv6 iptables rules"
-sudo ip6tables -t nat -A PREROUTING -i ${IFACE} -p tcp --dport 80 -j REDIRECT --to-port 8080\
-  && sudo ip6tables -t nat -A PREROUTING -i ${IFACE} -p tcp --dport 443 -j REDIRECT --to-port 8080\
+sudo ip6tables -t nat -A PREROUTING -i ${IFACE} -p tcp --dport 80 -j REDIRECT --to-port 8888\
+  && sudo ip6tables -t nat -A PREROUTING -i ${IFACE} -p tcp --dport 443 -j REDIRECT --to-port 8888\
   && sudo ip6tables -t nat -A PREROUTING -i ${IFACE} -p udp --dport 53 -j REDIRECT --to-port 5353\
   && sudo iptables -t nat -A POSTROUTING -o ${IFACE} -j MASQUERADE\
   && sudo ip6tables -A INPUT -p ipv6-icmp -j ACCEPT\
@@ -199,7 +199,7 @@ sudo ip6tables -t nat -A PREROUTING -i ${IFACE} -p tcp --dport 80 -j REDIRECT --
   && sudo ip6tables -A INPUT -p udp -m udp --dport 53 -j ACCEPT\
   && sudo ip6tables -A INPUT -p udp -m udp --dport 5353 -j ACCEPT\
   && sudo ip6tables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT\
-  && sudo ip6tables -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT\
+  && sudo ip6tables -A INPUT -p tcp -m tcp --dport 8888 -j ACCEPT\
   && sudo ip6tables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT\
   && sudo ip6tables -A INPUT -j REJECT --reject-with icmp6-adm-prohibited
 log_action_end_msg $?
@@ -394,21 +394,21 @@ if [[ -n "${EXTIP6}" ]] || [[ -n "${IPADDR6}" ]]; then
     log_action_end_msg $?
 fi
 
-printf "\nnetflix-proxy-admin site=http://${EXTIP}:8080/ credentials=\e[1madmin:${PLAINTEXT}\033[0m\n"
+printf "\nnetflix-proxy-admin site=http://${EXTIP}:8888/ credentials=\e[1madmin:${PLAINTEXT}\033[0m\n"
 log_action_begin_msg "testing netflix-proxy admin site"
 (with_backoff $(which curl) --silent -4\
-  --fail http://${EXTIP}:8080/ &>> ${CWD}/netflix-proxy.log\
+  --fail http://${EXTIP}:8888/ &>> ${CWD}/netflix-proxy.log\
   || with_backoff $(which curl) --silent -4\
-  --fail http://${IPADDR}:8080/) &>> ${CWD}/netflix-proxy.log\
+  --fail http://${IPADDR}:8888/) &>> ${CWD}/netflix-proxy.log\
   && with_backoff $(which curl) --silent -4\
   --fail http://localhost:${SDNS_ADMIN_PORT}/ &>> ${CWD}/netflix-proxy.log
 log_action_end_msg $?
 
 if [[ -n "${EXTIP6}" ]] && [[ -n "${IPADDR6}" ]]; then
-    printf "\nnetflix-proxy-admin site=http://${EXTIP6}:8080/ credentials=\e[1madmin:${PLAINTEXT}\033[0m\n"
+    printf "\nnetflix-proxy-admin site=http://${EXTIP6}:8888/ credentials=\e[1madmin:${PLAINTEXT}\033[0m\n"
     log_action_begin_msg "testing netflix-proxy admin site ipv6"
     with_backoff $(which curl) --silent -6\
-      --fail http://ip6-localhost:8080/ &>> ${CWD}/netflix-proxy.log
+      --fail http://ip6-localhost:8888/ &>> ${CWD}/netflix-proxy.log
     log_action_end_msg $?
 fi
 
